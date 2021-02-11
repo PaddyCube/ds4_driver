@@ -49,8 +49,8 @@ class StatusToTwist(object):
                 val = eval(expr, {}, input_vals)
                 setattr(vel_vec, k, scale * val)
 
-        self._pub.publish(to_pub)
-
+	if msg.button_r2:
+            self._pub.publish(to_pub)
 
 def main():
     rospy.init_node('ds4_twist')

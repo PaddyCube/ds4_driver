@@ -4,6 +4,7 @@
 
   <arg name="dof" default="6" />
   <arg name="stamped" default="false" />
+  <arg name="topic" default="joy_vel" />
 
   <include file="$(find ds4_driver)/launch/ds4_driver.launch" >
     <arg name="addr" value="$(arg addr)" />
@@ -12,7 +13,8 @@
 
   <node pkg="ds4_driver" type="ds4_twist_node.py" name="ds4_twist" output="screen" >
     <rosparam command="load" file="$(find ds4_driver)/config/twist_$(arg dof)dof.yaml" />
-
     <param name="stamped" value="$(arg stamped)" />
+    <remap from="cmd_vel" to="$(arg topic)" />
   </node>
+  
 </launch>
