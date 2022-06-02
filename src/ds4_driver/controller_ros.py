@@ -19,6 +19,7 @@ class ControllerRos(Controller):
         super(ControllerRos, self).__init__()
 
         self.use_standard_msgs = rospy.get_param('~use_standard_msgs', False)
+        self.use_ds4_msgs = rospy.get_param('~use_ds4_msgs', False)
         self.deadzone = rospy.get_param('~deadzone', 0.1)
         self.frame_id = rospy.get_param('~frame_id', 'ds4')
         self.imu_frame_id = rospy.get_param('~imu_frame_id', 'ds4_imu')
@@ -33,7 +34,7 @@ class ControllerRos(Controller):
             self.pub_joy = rospy.Publisher('joy', Joy, queue_size=1)
             self.pub_imu = rospy.Publisher('imu', Imu, queue_size=1)
             self.sub_feedback = rospy.Subscriber('set_feedback', JoyFeedbackArray, self.cb_joy_feedback, queue_size=1)
-        else:
+        if self.use_ds4_msgs:
             self.pub_status = rospy.Publisher('status', Status, queue_size=1)
             self.sub_feedback = rospy.Subscriber('set_feedback', Feedback, self.cb_feedback, queue_size=1)
 
@@ -77,7 +78,7 @@ class ControllerRos(Controller):
             self.pub_imu.publish(imu_msg)
 
             self._prev_joy = joy_msg
-        else:
+        if self.use_ds4_msgs:
             self.pub_status.publish(status_msg)
 
     def cb_feedback(self, msg):
