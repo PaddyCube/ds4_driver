@@ -21,8 +21,9 @@ requests have not yet been merged upstream. Until they are merged, use
 ```console
 $ git clone https://github.com/naoki-mizuno/ds4drv --branch devel
 $ cd ds4drv
-$ python2 setup.py install --prefix ~/.local
-$ sudo cp 50-ds4drv.rules /etc/udev/rules.d/
+$ mkdir -p ~/.local/lib/python3.8/site-packages
+$ python3 setup.py install --prefix ~/.local
+$ sudo cp udev/50-ds4drv.rules /etc/udev/rules.d/
 $ sudo udevadm control --reload-rules
 $ sudo udevadm trigger
 ```
@@ -81,9 +82,9 @@ This is the main node that interacts with DualShock 4.
   tested. Refer to the docs in `ds4drv` for details.
 - `~use_standard_msgs` (default: `false`): use ROS-standard messages such as
   `sensor_msgs/Joy`.
-- `~pub_joy_on_change` (default: `true`): only publish Joy messages when
-  changes to axes or buttons is detected. This parameter is only effective
-  when `use_standard_msgs` is `true`.
+- `~autorepeat_rate` (default: `0` (disabled)): rate in Hz at which a joystick
+  that has a non-changing state will resend the previously sent message. This
+  parameter is only effective when `use_standard_msgs` is `true`.
 - `~deadzone` (default: 0.1): amount by which the joystick has to move before
   it is considered to be off-center.
 - `~frame_id`: (default: `ds4`): frame ID to be used for the messages.

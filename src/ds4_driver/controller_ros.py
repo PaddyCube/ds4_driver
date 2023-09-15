@@ -24,7 +24,7 @@ class ControllerRos(Controller):
         self.frame_id = rospy.get_param('~frame_id', 'ds4')
         self.imu_frame_id = rospy.get_param('~imu_frame_id', 'ds4_imu')
         # Only publish Joy messages on change
-        self.pub_joy_on_change = rospy.get_param('~pub_joy_on_change', True)
+        self._autorepeat_rate = rospy.get_param('~autorepeat_rate', 0)
         self._prev_joy = None
 
         # Use ROS-standard messages (like sensor_msgs/Joy)
@@ -34,9 +34,14 @@ class ControllerRos(Controller):
             self.pub_joy = rospy.Publisher('joy', Joy, queue_size=1)
             self.pub_imu = rospy.Publisher('imu', Imu, queue_size=1)
             self.sub_feedback = rospy.Subscriber('set_feedback', JoyFeedbackArray, self.cb_joy_feedback, queue_size=1)
+
         if self.use_ds4_msgs:
-            self.pub_status = rospy.Publisher('status', Status, queue_size=1)
-            self.sub_feedback = rospy.Subscriber('set_feedback', Feedback, self.cb_feedback, queue_size=1)
+            if self._autorepeat_rate != 0:
+                period = 1.0 / self._autorepeat_rate
+                rospy.Timer(rospy.Duration.from_sec(period), self.cb_joy_pub_timer)
+            else:
+                self.pub_status = rospy.Publisher('status', Status, queue_size=1)
+                self.sub_feedback = rospy.Subscriber('set_feedback', Feedback, self.cb_feedback, queue_size=1)
 
     def cb_report(self, report):
         """
@@ -150,6 +155,10 @@ class ControllerRos(Controller):
 
         self.cb_feedback(feedback)
 
+    def cb_joy_pub_timer(self, _):
+        if self._prev_joy is not None:
+            self.pub_joy.publish(self._prev_joy)
+
     @staticmethod
     def _report_to_status_(report_msg, deadzone=0.05):
         status_msg = Status()
@@ -180,7 +189,7 @@ class ControllerRos(Controller):
         # To m/s^2: 0.98 mg/LSB (BMI055 data sheet Chapter 5.2.1)
         def to_mpss(v): return float(v) / (2**13 - 1) * 9.80665 * 0.98
         # To rad/s: 32767: 2000 deg/s (BMI055 data sheet Chapter 7.2.1)
-        def to_radps(v): return float(v) / (2**15 - 1) * math.pi / 180
+        def to_radps(v): return float(v) / (2**15 - 1) * math.pi / 180 * 2000
         # Convert
         status_msg.imu.linear_acceleration.x = to_mpss(report_msg.lin_acc_x)
         status_msg.imu.linear_acceleration.y = to_mpss(report_msg.lin_acc_y)
