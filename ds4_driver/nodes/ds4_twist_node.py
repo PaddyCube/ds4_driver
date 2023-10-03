@@ -88,8 +88,8 @@ class StatusToTwist(object):
                 except NameError:
                     # some names are not defined
                     pass
-
-        self._pub.publish(to_pub)
+        if msg.button_r2:
+            self._pub.publish(to_pub)
 
 
 def main():

@@ -21,6 +21,7 @@ class ControllerRos(Controller):
         self._logger = self.node.get_logger()
 
         self.node.declare_parameter("use_standard_msgs", False)
+        self.node.declare_parameter("use_ds4_msgs", False)
         self.node.declare_parameter("deadzone", 0.1)
         self.node.declare_parameter("frame_id", "ds4")
         self.node.declare_parameter("imu_frame_id", "ds4_imu")
@@ -28,6 +29,7 @@ class ControllerRos(Controller):
         self.node.declare_parameter("max_status_rate", 100.0)
 
         self.use_standard_msgs = self.node.get_parameter("use_standard_msgs").value
+        self.use_ds4_msgs = self.node.get_parameter("use_ds4_msgs").value
         self.deadzone = self.node.get_parameter("deadzone").value
         self.frame_id = self.node.get_parameter("frame_id").value
         self.imu_frame_id = self.node.get_parameter("imu_frame_id").value
@@ -46,14 +48,16 @@ class ControllerRos(Controller):
             self.pub_battery = self.node.create_publisher(BatteryState, "battery", 0)
             self.pub_joy = self.node.create_publisher(Joy, "joy", 0)
             self.pub_imu = self.node.create_publisher(Imu, "imu", 0)
-            self.sub_feedback = self.node.create_subscription(
-                JoyFeedbackArray, "set_feedback", self.cb_joy_feedback, 0
-            )
+
+            if self.use_ds4_msgs == False:
+                self.sub_feedback = self.node.create_subscription(
+                    JoyFeedbackArray, "set_feedback", self.cb_joy_feedback, 0
+                )
 
             if self._autorepeat_rate != 0:
                 period = 1.0 / self._autorepeat_rate
                 self.node.create_timer(period, self.cb_joy_pub_timer)
-        else:
+        if self.use_ds4_msgs:
             self.pub_status = self.node.create_publisher(Status, "status", 1)
             self.sub_feedback = self.node.create_subscription(
                 Feedback, "set_feedback", self.cb_feedback, 0
@@ -107,7 +111,7 @@ class ControllerRos(Controller):
             self.pub_imu.publish(imu_msg)
 
             self._prev_joy = joy_msg
-        else:
+        if self.use_ds4_msgs:
             self.pub_status.publish(status_msg)
 
         self._last_status_publish_time = now

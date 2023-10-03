@@ -127,6 +127,9 @@ package. This node is something similar to
 [`teleop_twist_joy`](http://wiki.ros.org/teleop_twist_joy) but is specifically
 for a DualShock 4.
 
+### HINT
+You need to keep button RT pressed to send commands. This way, joystick will not send zero-velocity, when not in use.This would otherwise cause issues when used with other cmd_vel sources simultaneously (i.e. cmd_vel from joystick and navigation stack at the same time).
+
 ### Parameters
 
 - `~stamped` (default: `false`): whether to publish `Twist` or `TwistStamped`
