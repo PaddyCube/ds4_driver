@@ -91,6 +91,30 @@ This is the main node that interacts with DualShock 4.
 - `~imu_frame_id` (default: `ds4_imu`): frame ID to be used for the IMU
   messages.
 
+#### Button mapping
+When using standard joy messages, the mapping of PS4 controller buttons to sensors_msgs/Joy message is like this (at least for my chinese PS4 controller)
+|---------------|-------------------|
+|PS4 button     |Joy msgs button array (index)    |
+|---------------|-------------------|
+| square   | 0 |
+| triangle | 1 |
+| star     | 2 |
+| cross    | 3 |
+| LB       | 4 |
+| LT       | 5 |
+| RB       | 6 |
+| RT       | 7 |
+| share    | 8 |
+| options  | 9 |
+| touch click   | 11 |
+| left joystick click | 12 |
+| right joystick click | 13 |
+| up       | 15 |
+| down     | 17 |
+| left     | 14 |
+| right    | 16 |
+
+
 ### Topics
 
 #### Published
