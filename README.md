@@ -93,7 +93,7 @@ This is the main node that interacts with DualShock 4.
 
 #### Button mapping
 When using standard joy messages, the mapping of PS4 controller buttons to sensors_msgs/Joy message is like this (at least for my chinese PS4 controller)
-|---------------|-------------------|
+
 |PS4 button     |Joy msgs button array (index)    |
 |---------------|-------------------|
 | square   | 0 |
